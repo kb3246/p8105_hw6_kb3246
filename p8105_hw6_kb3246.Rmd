@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 	warning = FALSE,
 	fig.width = 9, 
   fig.height = 7,
-  out.width = "95%"
+  out.width = "90%"
 )
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 options(
@@ -124,7 +124,8 @@ homicides_or_plot=
   geom_point(alpha = 0.5)+
   geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper),
                 alpha = 0.5)+ 
-  labs(title = "Estimated Odds Ratios and their 95% CIs of Solved Homicides for Each City (Comparing Male Vs. Female Victims)", 
+  labs(title = "Estimated Odds Ratios and their 95% CIs of Solved Homicides for Each City 
+       (Comparing Male Vs. Female Victims)", 
        x = "City, State", 
        y = "Estimated ORs and 95% CIs")+
   theme(plot.title = element_text(size = 12, hjust = 0.5),
@@ -219,14 +220,33 @@ birthweight_cv = crossv_mc(birthweight, 100) %>%
   mutate(model1_cv = map(train, ~lm(bwt ~ wtgain, data = .x)),
          model2_cv = map(train, ~lm(bwt ~ blength + gaweeks, data = .x)),
          model3_cv = map(train, ~lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + blength*babysex + bhead*blength*babysex, data = .x))) %>% 
-  mutate(rmse_m1 = map2_dbl(model1_cv, test, ~rmse(model = .x, data = .y)),
-         rmse_m2 = map2_dbl(model2_cv, test, ~rmse(model = .x, data = .y)), 
-         rmse_m3 = map2_dbl(model3_cv, test, ~rmse(model = .x, data = .y)))
+  mutate(rmse_model1 = map2_dbl(model1_cv, test, ~rmse(model = .x, data = .y)),
+         rmse_model2 = map2_dbl(model2_cv, test, ~rmse(model = .x, data = .y)), 
+         rmse_model3 = map2_dbl(model3_cv, test, ~rmse(model = .x, data = .y)))
 ```
 
 ### Crossvalidation Residual Plot
 
-```{r cv plot}
+```{r cv plot, dpi=300}
+cv_plot= 
+  birthweight_cv %>%
+  select(starts_with("rmse")) %>% 
+  pivot_longer(everything(), 
+               names_to = "model",
+               values_to = "rmse",
+               names_prefix = "rmse_") %>% 
+  ggplot(aes(x = model, y = rmse)) + 
+  geom_violin()+
+  labs(title = "Comparing the Birthweight Models",
+      x = "Model",
+      y = "rmse")+
+  theme(plot.title = element_text(size = 12, hjust = 0.5))
+  
+
+cv_plot
 ```
 
+#### Inference About the Models
+
+Here, it is evident that `model3` has the lowest RMSE, and therefore, would be the best model among the three. 
 
