@@ -198,6 +198,15 @@ model2 = lm(bwt ~ blength + gaweeks, data = birthweight)
 model2
 ```
 
+## Model 3
+
+```{r}
+model3 = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + blength*babysex + bhead*blength*babysex, data = birthweight)
+
+model3
+```
+
+
 
 
 
