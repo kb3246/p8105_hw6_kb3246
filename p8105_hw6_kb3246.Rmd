@@ -8,8 +8,10 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-library(ggridges)
 library(patchwork)
+library(mgcv)
+library(rvest)
+library(modelr)
 knitr::opts_chunk$set(
 	echo = TRUE,
 	warning = FALSE,
@@ -166,7 +168,7 @@ Studies have shown that the baby's sex, mother's age at delivery, race, income a
 
 Therefore, for `model1` I included the variables `babysex`, `fincome`, `momage`, `mrace` and `parity` as possible predictors of birthweight. This model is based on a hypothesized structure for the factors that underly birthweight. 
 
-```{r}
+```{r model1}
 model1 = lm(bwt ~ babysex+ fincome + momage + mrace + parity, data = birthweight)
 
 model1
@@ -174,7 +176,7 @@ model1
 
 ### `model1` Residual Plot 
 
-```{r}
+```{r model1 plot}
 model1_plot =
   birthweight %>%
   modelr::add_predictions(model1) %>%
@@ -192,7 +194,7 @@ model1_plot
 
 `model2` uses length at birth and gestational age as predictors (main effects only). 
 
-```{r}
+```{r model2}
 model2 = lm(bwt ~ blength + gaweeks, data = birthweight)
 
 model2
@@ -200,13 +202,31 @@ model2
 
 ## Model 3
 
-```{r}
+```{r model3}
 model3 = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + blength*babysex + bhead*blength*babysex, data = birthweight)
 
 model3
 ```
 
+## Crossvalidation 
 
+Now we want to compare `model1` with `model2` and `model3` in terms of the cross-validated prediction error by using `crossv_mc` and functions in `purrr` as appropriate.
 
+```{r crossvalidation}
+birthweight_cv = crossv_mc(birthweight, 100) %>% 
+  mutate(train = map(train, as_tibble),
+         test = map(test, as_tibble)) %>% 
+  mutate(model1_cv = map(train, ~lm(bwt ~ wtgain, data = .x)),
+         model2_cv = map(train, ~lm(bwt ~ blength + gaweeks, data = .x)),
+         model3_cv = map(train, ~lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + blength*babysex + bhead*blength*babysex, data = .x))) %>% 
+  mutate(rmse_m1 = map2_dbl(model1_cv, test, ~rmse(model = .x, data = .y)),
+         rmse_m2 = map2_dbl(model2_cv, test, ~rmse(model = .x, data = .y)), 
+         rmse_m3 = map2_dbl(model3_cv, test, ~rmse(model = .x, data = .y)))
+```
+
+### Crossvalidation Residual Plot
+
+```{r cv plot}
+```
 
 
