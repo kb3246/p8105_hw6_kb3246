@@ -1,0 +1,49 @@
+---
+title: "Data Science HW-6"
+author: "Kasturi Bhamidipati"
+date: "2022-12-02"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggridges)
+library(patchwork)
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+	fig.width = 9, 
+  fig.height = 7,
+  out.width = "95%"
+)
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+# Problem 1 
+ 
+# Problem 2 
+
+## Importing and tidying data 
+
+We want to import the `homicides` dataset and make the necessary changes as noted in the problem.
+
+```{r importing homicide data, message = FALSE}
+homicides = 
+  read_csv("./data/homicide-data.csv") %>%
+  janitor::clean_names()%>%
+   mutate(
+    city_state = str_c(city,state, sep = ","),
+    victim_age = as.numeric(victim_age), 
+    status = as.numeric(disposition == "Closed by arrest"))%>%
+  filter(!city_state %in% c("Dallas,TX", "Phoenix,AZ", "Kansas City,MO", "Tulsa,AL"),
+         victim_race %in% c("Black", "White"))
+```
+
+## Baltimore `glm` 

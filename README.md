@@ -1,1 +1,1 @@
-# p8105_hw6_kb3246
+# This is Homework-6 for the P8105 Data Science course. 
