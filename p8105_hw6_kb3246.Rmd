@@ -142,4 +142,23 @@ homicides_or_plot
 
 - I also notice that for some cities, the 95% CIs are very wide (for example - Albuquerque, NM and Stockton, CA). 
 
+# Problem 3 
+
+## Importing and cleaning `birthweight.csv`
+
+```{r importing brithweight, message=FALSE}
+birthweight = 
+  read_csv("./data/birthweight.csv")%>% 
+  janitor::clean_names()%>%
+  mutate(babysex = as.factor(babysex),
+         frace = as.factor(frace),
+         malform = as.factor(malform),
+         mrace = as.factor(mrace))
+
+sum(is.na(birthweight))
+```
+
+Therefore, we cleaned the data as appropriate; converted numeric to factor where appropriate and checked for missing data using `sum(is.na())`. No missing data were found in the `birthweight.csv` dataset. 
+
+
 
