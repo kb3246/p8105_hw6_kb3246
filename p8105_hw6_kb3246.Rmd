@@ -41,9 +41,40 @@ homicides =
    mutate(
     city_state = str_c(city,state, sep = ","),
     victim_age = as.numeric(victim_age), 
-    status = as.numeric(disposition == "Closed by arrest"))%>%
-  filter(!city_state %in% c("Dallas,TX", "Phoenix,AZ", "Kansas City,MO", "Tulsa,AL"),
-         victim_race %in% c("Black", "White"))
+    solved = as.numeric(disposition == "Closed by arrest"))%>%
+  filter(
+    !city_state %in% c("Dallas,TX", "Phoenix,AZ", "Kansas City,MO", "Tulsa,AL"),
+    victim_race %in% c("Black", "White")
+    ) %>% 
+  select(victim_race, victim_age, victim_sex, city_state, solved)
+
 ```
 
 ## Baltimore `glm` 
+
+For the city of Baltimore, MD, we want to use the `glm` function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race as predictors. 
+
+```{r}
+baltimore_glm = 
+  homicides %>% 
+  filter(city_state == "Baltimore,MD") %>% 
+  glm(solved ~ victim_age + victim_sex + victim_race, 
+      family = binomial(), 
+      data = .) %>% 
+  broom::tidy() %>% 
+  janitor::clean_names()%>% 
+  mutate(OR = exp(estimate),
+         CI_lower = exp(estimate - 1.96*std_error),
+         CI_upper = exp(estimate + 1.96*std_error))
+
+baltimore_glm
+```
+
+Now we want to obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing male victims to female victims keeping all other variables fixed.
+
+```{r}
+
+```
+
+
+
