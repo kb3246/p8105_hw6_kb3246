@@ -99,11 +99,36 @@ homicides_glm =
          CI_lower = exp(estimate - 1.96 * std.error),
          CI_upper = exp(estimate + 1.96 * std.error)) %>% 
   filter(term == "victim_sexMale") %>% 
-  select(city_state, OR, CI_lower, CI_upper)%>%
+  select(city_state, OR, CI_lower, CI_upper)
+  
+homicides_table= 
+  homicides_glm%>%
   knitr::kable(digits = 3, col.names = c('City, State','Odds Ratio', 'Lower CI', 'Upper CI'))
 
-homicides_glm
+homicides_table
+
+
 ```
 
+## Plot for Adjusted OR and 95% CI 
+
+Now we want to create a plot that shows the estimated ORs and CIs for each city. We will also organize cities according to estimated OR. 
+
+```{r OR plot, dpi=300}
+homicides_or_plot= 
+  homicides_glm %>%
+  mutate( city_state = fct_reorder(city_state, OR)) %>%
+  ggplot(aes(x = city_state, y =OR))+
+  geom_point(alpha = 0.5)+
+  geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper),
+                alpha = 0.5)+ 
+  labs(title = "Estimated Odds Ratios and their 95% CIs of Solved Homicides for Each City (Comparing Male Vs. Female Victims)", 
+       x = "City, State", 
+       y = "Estimated ORs and 95% CIs")+
+  theme(plot.title = element_text(size = 12, hjust = 0.5),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+homicides_or_plot
+```
 
 
