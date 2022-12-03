@@ -160,5 +160,44 @@ sum(is.na(birthweight))
 
 Therefore, we cleaned the data as appropriate; converted numeric to factor where appropriate and checked for missing data using `sum(is.na())`. No missing data were found in the `birthweight.csv` dataset. 
 
+## Model 1 - Proposed model 
+
+Studies have shown that the baby's sex, mother's age at delivery, race, income and parity are possible factors that affect the weight of an infant at birth. 
+
+Therefore, for `model1` I included the variables `babysex`, `fincome`, `momage`, `mrace` and `parity` as possible predictors of birthweight. This model is based on a hypothesized structure for the factors that underly birthweight. 
+
+```{r}
+model1 = lm(bwt ~ babysex+ fincome + momage + mrace + parity, data = birthweight)
+
+model1
+```
+
+### `model1` Residual Plot 
+
+```{r}
+model1_plot =
+  birthweight %>%
+  modelr::add_predictions(model1) %>%
+  modelr::add_residuals(model1) %>%
+  ggplot(aes(x = pred, y = resid))+
+  geom_violin()+
+  labs(title = "Model 1 Residuals Plot",
+       x = "Predicted",
+       y = "Residuals")
+
+model1_plot
+```
+
+## Model 2
+
+`model2` uses length at birth and gestational age as predictors (main effects only). 
+
+```{r}
+model2 = lm(bwt ~ blength + gaweeks, data = birthweight)
+
+model2
+```
+
+
 
 
