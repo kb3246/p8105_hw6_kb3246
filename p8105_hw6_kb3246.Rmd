@@ -54,7 +54,7 @@ homicides =
 
 For the city of Baltimore, MD, we want to use the `glm` function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race as predictors. 
 
-```{r}
+```{r baltimore glm}
 baltimore_glm = 
   homicides %>% 
   filter(city_state == "Baltimore,MD") %>% 
@@ -72,9 +72,12 @@ baltimore_glm
 
 Now we want to obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing male victims to female victims keeping all other variables fixed.
 
-```{r}
-
+```{r men vs women}
+baltimore_glm %>%
+  filter(term == "victim_sexMale") %>%
+  select(OR, CI_lower, CI_upper) %>% 
+  knitr::kable(digits = 3, col.names = c('Odds Ratio', 'Lower CI', 'Upper CI'))
 ```
 
-
+Therefore, we see that the adjusted odds ratio and its 95% CI for solving homicides comparing male victims to female victims, keeping all else constant is OR (95% CI) = `r round(baltimore_glm %>% filter(term == "victim_sexMale") %>% pull(OR), 3)` (`r round(baltimore_glm %>% filter(term == "victim_sexMale") %>% pull(CI_lower), 3)`, `r round(baltimore_glm %>% filter(term == "victim_sexMale") %>% pull(CI_upper), 3)`).
 
